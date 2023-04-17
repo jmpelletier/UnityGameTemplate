@@ -187,21 +187,6 @@ public class Player : MonoBehaviour
         }
     }
 
-    // このメソッドはPlayerInputコンポーネントに呼び出される。
-    void OnFire(InputValue inputValue)
-    {
-        if (canFire) {
-            // アニメーターに通知を送信して、演出を切り替えてもらう。
-            animator.SetTrigger("Fire");
-
-            // 効果音を再生する。
-            audioSource.PlayOneShot(fireSound);
-
-            // Actionを監視しているスクリプトがあれば実行する。
-            OnFireActions?.Invoke();
-        }
-    }
-
     void OnMove(InputValue inputValue)
     {
         motionInput = inputValue.Get<Vector2>();
