@@ -49,9 +49,6 @@ public class Manager : MonoBehaviour
 
         // プレーヤーオブジェクトの「BasePlayer」コンポーネントを取得する
         Player player = playerObject.GetComponent<Player>();
-
-        // プレーヤーのActionを監視する
-        player.OnFireActions += PlayerFired;
     }
 
     // ゲームプレイを開始する
@@ -104,13 +101,6 @@ public class Manager : MonoBehaviour
     void Update()
     {
         
-    }
-
-    // Playerで何かイベントが発生したら、反応するメソッドを用意する。
-    // ここは、発射（Fire）が起きた時に反応する。
-    void PlayerFired()
-    {
-        Debug.Log("Fire!");
     }
 }
 

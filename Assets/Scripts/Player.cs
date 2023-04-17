@@ -60,10 +60,6 @@ public class Player : MonoBehaviour
     public bool canFire = true;
     public bool canJump = true;
 
-    // Player以外（特にManager）のゲームオブジェクトがここで発生した
-    // イベントに対して反応するためにC#のActionを用意する。
-    public Action OnFireActions;
-
     // ここに使うコンポーネントへの参照を用意する。
     // PlayerInputは必要だが、スクリプトでは参照を
     // 使わない。
