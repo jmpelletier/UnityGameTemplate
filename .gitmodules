@@ -1,0 +1,3 @@
+[submodule "Assets/PuzzleBox"]
+	path = Assets/PuzzleBox
+	url = git@github.com:jmpelletier/PuzzleBoxUnity.git
