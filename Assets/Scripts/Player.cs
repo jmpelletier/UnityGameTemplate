@@ -99,14 +99,22 @@ public class Player : MonoBehaviour
             kinematicMotion.AddImpulse(kinematicMotion.groundRight * motionInput.x * walkAcceleration * Time.fixedDeltaTime);
         }
         else {
-            Vector2 groundVelocity = kinematicMotion.groundVelocity;
-            Vector2 breakDirection = groundVelocity.normalized * -1f;
-            Vector2 breakImpulse = breakDirection * Mathf.Min(walkBreakForce * Time.fixedDeltaTime, groundVelocity.magnitude);
-            kinematicMotion.AddImpulse(breakImpulse);
+            float speed = kinematicMotion.groundVelocity.magnitude;
+            if (speed < kinematicMotion.minSpeed) {
+                kinematicMotion.AddImpulse(kinematicMotion.groundVelocity * -1f);
+            }
+            else {
+                Vector2 breakDirection = kinematicMotion.groundVelocity.normalized * -1f;
+                Vector2 breakImpulse = breakDirection * Mathf.Min(walkBreakForce * Time.fixedDeltaTime, speed);
+                kinematicMotion.AddImpulse(breakImpulse);
+            }
+            
+            // Debug.DrawRay(transform.position, breakImpulse * 10f, Color.red);
         }
 
         float groundSpeed = kinematicMotion.groundVelocity.magnitude;
-        if (groundSpeed > maxWalkSpeed) {
+        if (groundSpeed > maxWalkSpeed)
+        {
             Vector2 groundVelocity = kinematicMotion.groundVelocity;
             Vector2 breakDirection = groundVelocity.normalized * -1f;
             Vector2 breakImpulse = breakDirection * (groundSpeed - maxWalkSpeed);
@@ -116,23 +124,26 @@ public class Player : MonoBehaviour
 
     void ApplyAirMotion()
     {
+        float horizontalVelocity = Vector2.Dot(kinematicMotion.velocity, kinematicMotion.gravityRight);
+        float horizontalDirection = Mathf.Sign(horizontalVelocity);
+        float groundHorizontalDirection = Mathf.Sign(Vector2.Dot(kinematicMotion.lastGroundVelocity, kinematicMotion.gravityRight));
+        float airSpeedX = Mathf.Abs(horizontalVelocity);
+        float speedLimit = maxAirSpeed;
+
         if (Mathf.Abs(motionInput.x) > 0) {
-            kinematicMotion.AddImpulse(Vector2.right * motionInput.x * airAcceleration * Time.fixedDeltaTime);
+            kinematicMotion.AddImpulse(kinematicMotion.gravityRight * motionInput.x * airAcceleration * Time.fixedDeltaTime);
         }
         else {
-            float airVelocityX = kinematicMotion.velocity.x; 
-            float breakDirection = Mathf.Sign(airVelocityX) * -1f;
-            Vector2 breakImpulse = breakDirection * Vector2.right * Mathf.Min(airBreakForce * Time.fixedDeltaTime, Mathf.Abs(airVelocityX));
+            float breakDirection = horizontalDirection * -1f;
+            Vector2 breakImpulse = breakDirection * kinematicMotion.gravityRight * Mathf.Min(airBreakForce * Time.fixedDeltaTime, Mathf.Abs(horizontalVelocity));
             kinematicMotion.AddImpulse(breakImpulse);
         }
 
-        float airSpeedX = Mathf.Abs(kinematicMotion.velocity.x);
-        float speedLimit = maxAirSpeed;
-        if (Mathf.Sign(kinematicMotion.velocity.x) == Mathf.Sign(kinematicMotion.lastGroundVelocity.x)) {
-            speedLimit = Mathf.Max(Mathf.Abs(kinematicMotion.lastGroundVelocity.x), speedLimit);
+        if (horizontalDirection == groundHorizontalDirection) {
+            speedLimit = Mathf.Max(Mathf.Abs(Vector2.Dot(kinematicMotion.lastGroundVelocity, kinematicMotion.gravityRight)), speedLimit);
         }
         if (airSpeedX > speedLimit) {
-            Vector2 breakImpulse = Vector2.right * (airSpeedX - speedLimit) * -Mathf.Sign(kinematicMotion.velocity.x);
+            Vector2 breakImpulse = kinematicMotion.gravityRight * (airSpeedX - speedLimit) * -horizontalDirection;
             kinematicMotion.AddImpulse(breakImpulse);
         }
     }
@@ -175,7 +186,7 @@ public class Player : MonoBehaviour
         {
             if (CanJump()) {
                 isJumping = true;
-                kinematicMotion.AddImpulse(Vector2.up * jumpVelocity);
+                kinematicMotion.AddImpulse(kinematicMotion.gravityUp * jumpVelocity);
             }
         }
         else {
